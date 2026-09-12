@@ -132,7 +132,7 @@ function Index() {
               Make every decision count.
             </h2>
             <Button asChild variant="hero" size="hero">
-              <a href="mailto:hello@yourvirtualcaddy.com?subject=Get%20Started">
+              <a href="#concept">
                 Get Started
                 <ArrowUpRight className="size-4" aria-hidden="true" />
               </a>
