@@ -125,8 +125,8 @@
   --cta-foreground: oklch(0.96 0.008 100);
   --cta-muted: oklch(0.76 0.018 120);
   --cta-line: oklch(0.96 0.008 100 / 16%);
-  --shadow-hero: 0 16px 50px -18px oklch(0.08 0.02 145 / 55%);
-  --shadow-signal: 0 0 0 8px oklch(0.79 0.17 130 / 14%), 0 0 24px oklch(0.79 0.17 130 / 55%);
+  --shadow-hero: 0 12px 36px -16px oklch(0.08 0.02 145 / 40%);
+  --shadow-signal: 0 0 0 5px oklch(0.79 0.17 130 / 12%), 0 0 14px oklch(0.79 0.17 130 / 40%);
 }
 
 .dark {
@@ -189,12 +189,28 @@
 
 @utility hero-scrim {
   background:
-    linear-gradient(90deg, oklch(0.09 0.012 145 / 82%) 0%, oklch(0.09 0.012 145 / 45%) 42%, oklch(0.09 0.012 145 / 12%) 75%),
-    linear-gradient(0deg, oklch(0.08 0.012 145 / 72%) 0%, transparent 48%, oklch(0.08 0.012 145 / 28%) 100%);
+    linear-gradient(
+      90deg,
+      oklch(0.1 0.014 145 / 72%) 0%,
+      oklch(0.1 0.014 145 / 48%) 22%,
+      oklch(0.1 0.012 145 / 26%) 42%,
+      oklch(0.1 0.01 145 / 10%) 62%,
+      oklch(0.1 0.008 145 / 0%) 82%
+    ),
+    linear-gradient(
+      0deg,
+      oklch(0.08 0.012 145 / 42%) 0%,
+      transparent 46%,
+      oklch(0.08 0.012 145 / 18%) 100%
+    );
 }
 
 @utility hero-enter {
   animation: hero-enter 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility concept-viz {
+  animation: concept-viz-enter 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes hero-enter {
@@ -208,11 +224,45 @@
   }
 }
 
+@keyframes concept-viz-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes concept-shot-draw {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.concept-shot-path {
+  animation: concept-shot-draw 900ms ease 0.45s both;
+}
+
 @media (max-width: 639px) {
   .hero-scrim {
     background:
-      linear-gradient(90deg, oklch(0.09 0.012 145 / 72%) 0%, oklch(0.09 0.012 145 / 18%) 100%),
-      linear-gradient(0deg, oklch(0.08 0.012 145 / 82%) 0%, transparent 62%, oklch(0.08 0.012 145 / 34%) 100%);
+      linear-gradient(
+        90deg,
+        oklch(0.1 0.014 145 / 66%) 0%,
+        oklch(0.1 0.012 145 / 28%) 55%,
+        oklch(0.1 0.01 145 / 8%) 100%
+      ),
+      linear-gradient(
+        0deg,
+        oklch(0.08 0.012 145 / 58%) 0%,
+        transparent 58%,
+        oklch(0.08 0.012 145 / 22%) 100%
+      );
   }
 }
 
@@ -221,7 +271,12 @@
     scroll-behavior: auto;
   }
 
-  .hero-enter {
+  .hero-enter,
+  .concept-viz {
+    animation: none;
+  }
+
+  .concept-shot-path {
     animation: none;
   }
 }
