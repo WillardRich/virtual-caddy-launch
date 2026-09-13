@@ -113,9 +113,9 @@ function Index() {
               </radialGradient>
             </defs>
 
-            {/* Approach: fairway → green */}
+            {/* Approach: fairway → center of putting green */}
             <path
-              d="M 1421 691 C 1460 520, 1500 360, 1555 243"
+              d="M 1421 691 C 1475 580, 1505 490, 1515 415"
               stroke="oklch(0.96 0.01 100 / 55%)"
               strokeWidth="2"
               strokeLinecap="round"
@@ -124,13 +124,13 @@ function Index() {
 
             {/* Green target — on the putting surface */}
             <circle
-              cx="1555"
-              cy="243"
+              cx="1515"
+              cy="415"
               r="18"
               stroke="oklch(0.74 0.15 134 / 55%)"
               strokeWidth="1.75"
             />
-            <circle cx="1555" cy="243" r="4.5" fill="oklch(0.74 0.15 134 / 85%)" />
+            <circle cx="1515" cy="415" r="4.5" fill="oklch(0.74 0.15 134 / 85%)" />
 
             {/* Soft fairway lie — readable despite photo shadows */}
             <ellipse cx="1421" cy="691" rx="52" ry="28" fill="url(#fairway-lie)" />

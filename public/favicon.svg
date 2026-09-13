@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="YVC">
+  <circle cx="16" cy="16" r="15" fill="#1c2a20" stroke="rgba(220,225,210,0.45)" stroke-width="1" />
+  <text
+    x="16"
+    y="16.5"
+    text-anchor="middle"
+    dominant-baseline="central"
+    font-family="Manrope, Segoe UI, Arial, sans-serif"
+    font-size="9"
+    font-weight="600"
+    letter-spacing="1.4"
+    fill="rgba(220,225,210,0.9)"
+  >YVC</text>
+</svg>

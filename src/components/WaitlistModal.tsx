@@ -65,10 +65,10 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
               You&apos;re in
             </p>
             <DialogTitle className="mt-4 text-[1.85rem] font-semibold leading-[1.1] tracking-[-0.02em] text-foreground">
-              You&apos;re on the list.
+              Thank you for your response.
             </DialogTitle>
             <DialogDescription className="mt-4 text-[0.95rem] leading-relaxed text-muted-foreground">
-              We&apos;ll let you know when Your Virtual Caddy is ready for you to try.
+              We&apos;ll be in touch when Your Virtual Caddy is ready.
             </DialogDescription>
             <Button
               type="button"
@@ -104,14 +104,17 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
                 inputMode="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  if (error) setError(null);
+                }}
                 disabled={pending}
                 aria-invalid={Boolean(error)}
                 className="h-12 rounded-[4px] border-border bg-card px-4 text-[0.95rem] shadow-none placeholder:text-muted-foreground/70 focus-visible:ring-primary"
               />
 
               {error ? (
-                <p className="mt-3 text-[0.8rem] leading-snug text-destructive" role="alert">
+                <p className="mt-3 text-[0.8rem] leading-snug text-muted-foreground" role="alert">
                   {error}
                 </p>
               ) : null}
@@ -122,7 +125,7 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
                 disabled={pending}
                 className="mt-4 h-12 w-full rounded-full px-6 text-[0.8rem] font-semibold"
               >
-                {pending ? "Saving…" : "Keep me posted"}
+                {pending ? "Submitting…" : "Keep me posted"}
                 {!pending ? <ArrowRight className="size-3.5" aria-hidden="true" /> : null}
               </Button>
             </form>
