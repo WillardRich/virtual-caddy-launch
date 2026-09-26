@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 
 import courseImage from "@/assets/virtual-caddy-course.jpg";
@@ -59,13 +59,27 @@ function Index() {
               Your Virtual Caddy
             </span>
           </a>
-          <button
-            type="button"
-            onClick={openWaitlist}
-            className="text-[0.7rem] font-medium tracking-[0.04em] text-hero-faint transition-colors hover:text-hero-foreground"
-          >
-            Get Started
-          </button>
+          <div className="flex items-center gap-4 sm:gap-5">
+            <Link
+              to="/login"
+              className="text-[0.7rem] font-medium tracking-[0.04em] text-hero-faint transition-colors hover:text-hero-foreground"
+            >
+              Log in
+            </Link>
+            <Link
+              to="/signup"
+              className="text-[0.7rem] font-medium tracking-[0.04em] text-hero-faint transition-colors hover:text-hero-foreground"
+            >
+              Sign up
+            </Link>
+            <button
+              type="button"
+              onClick={openWaitlist}
+              className="text-[0.7rem] font-medium tracking-[0.04em] text-hero-faint transition-colors hover:text-hero-foreground"
+            >
+              Get Started
+            </button>
+          </div>
         </header>
 
         <div

@@ -1,0 +1,26 @@
+---
+description: Your Virtual Caddy product context — MVP vs vision, decision engine focus, $0 stack
+alwaysApply: true
+---
+
+# Product Context
+
+Canonical product brief: [`docs/PRODUCT_CONTEXT.md`](../../docs/PRODUCT_CONTEXT.md)
+
+Read that document before inventing product architecture, features, or paid infrastructure.
+
+## Non-negotiables
+
+- **Core product** = golf **decision-making engine** (“What should I do here?”), not GPS/rangefinder/scorecard/chatbot-first.
+- **Do not confuse vision with MVP.** MVP validates whether caddy advice is useful in a real round, as cheaply as possible (~$0 ops).
+- **Mobile-first** (one-handed on-course use): large targets, minimal typing, high outdoor readability.
+- Prefer **mock/deterministic caddy** and free/static course data before LLM spend or premium course APIs.
+- **No custom model training.** App calculates objective factors; AI reasons about strategy.
+- **No learning/ML system in MVP.** Store useful player data; personalization comes later.
+- **No GPS required for MVP.** Manual course/hole/distance/situation → recommendation is enough.
+- Onboarding asks handicap, average score, driver carry, club distances, recent scores — **not** strengths/weaknesses/common miss.
+- Plan architecture docs before large implementation (frontend, backend, data, AI, course data, GPS, infra).
+
+## Current repo note
+
+Existing landing + waitlist prototype stays valid for early validation. Application flows (signup, onboarding, caddy screen) should follow the phases in the product context doc.
