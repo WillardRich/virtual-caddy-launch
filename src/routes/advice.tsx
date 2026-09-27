@@ -1,15 +1,19 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 
-import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useOnboardedUser } from "@/hooks/use-onboarded-user";
 import {
-  getMockRecommendation,
+  getCaddyRecommendation,
   type CaddyRecommendation,
   type Lie,
+  type PlayerContext,
+  type ShotContext,
 } from "@/lib/caddy";
-import { getProfileStatus } from "@/lib/profile";
+import { getCourse, getHole, toCourseContext } from "@/lib/courses";
+import { getPlayerContext } from "@/lib/profile";
+import { useActiveRound } from "@/lib/round";
 
 export const Route = createFileRoute("/advice")({
   head: () => ({
@@ -31,45 +35,34 @@ const inputClassName =
   "h-14 rounded-[4px] border-border bg-card px-4 text-center text-[1.35rem] font-semibold tabular-nums shadow-none placeholder:text-muted-foreground/70 focus-visible:ring-primary";
 
 function AdvicePage() {
-  const { session, loading } = useAuth();
+  const { userId, ready } = useOnboardedUser();
+  const round = useActiveRound(userId);
   const navigate = useNavigate();
-  const [ready, setReady] = useState(false);
 
+  const [player, setPlayer] = useState<PlayerContext | null>(null);
   const [step, setStep] = useState<Step>("distance");
-  const [distanceRaw, setDistanceRaw] = useState("154");
+  const [distanceRaw, setDistanceRaw] = useState("");
   const [distance, setDistance] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [recommendation, setRecommendation] = useState<CaddyRecommendation | null>(null);
 
   useEffect(() => {
-    if (loading) return;
-
-    if (!session?.user) {
-      void navigate({ to: "/login" });
-      return;
-    }
-
+    if (!ready || !userId) return;
     let active = true;
-    void (async () => {
-      const status = await getProfileStatus(session.user.id);
-      if (!active) return;
-
-      if (!status?.onboardingCompleted) {
-        void navigate({ to: "/onboarding" });
-        return;
-      }
-
-      setReady(true);
-    })();
-
+    void getPlayerContext(userId).then((context) => {
+      if (active) setPlayer(context);
+    });
     return () => {
       active = false;
     };
-  }, [loading, session, navigate]);
+  }, [ready, userId]);
+
+  const course = round ? getCourse(round.courseId) : null;
+  const hole = round ? getHole(round.courseId, round.currentHole) : null;
 
   function resetFlow() {
     setStep("distance");
-    setDistanceRaw("154");
+    setDistanceRaw("");
     setDistance(null);
     setError(null);
     setRecommendation(null);
@@ -80,8 +73,8 @@ function AdvicePage() {
     setError(null);
 
     const value = Number(distanceRaw.trim());
-    if (!Number.isFinite(value) || value < 1 || value > 500) {
-      setError("Enter a distance between 1 and 500 yards.");
+    if (!distanceRaw.trim() || !Number.isFinite(value) || value < 1 || value > 700) {
+      setError("Enter a distance between 1 and 700 yards.");
       return;
     }
 
@@ -90,13 +83,24 @@ function AdvicePage() {
   }
 
   function handleLieSelect(lie: Lie) {
-    if (distance == null) return;
-    const result = getMockRecommendation(distance, lie);
-    setRecommendation(result);
+    if (distance == null || !course || !hole) return;
+
+    const shot: ShotContext = {
+      distance,
+      distanceUnit: "yards",
+      lie,
+      course: course.id,
+      hole: hole.number,
+      pinPosition: null,
+      wind: null,
+      elevation: null,
+    };
+
+    setRecommendation(getCaddyRecommendation(shot, toCourseContext(hole), player));
     setStep("recommendation");
   }
 
-  if (loading || !session || !ready) {
+  if (!ready) {
     return (
       <main className="flex min-h-svh items-center justify-center bg-background px-5">
         <p className="text-[0.85rem] text-muted-foreground">Loading…</p>
@@ -106,22 +110,46 @@ function AdvicePage() {
 
   return (
     <main className="flex min-h-svh flex-col bg-background px-5 py-10 sm:px-[6vw] sm:py-14">
-      <header className="mx-auto flex w-full max-w-md items-center justify-between">
+      <header className="mx-auto flex w-full max-w-md items-center justify-between gap-4">
         <Link
           to="/app"
           className="text-[0.8rem] font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
           Home
         </Link>
-        <span className="text-[0.7rem] font-medium tracking-[0.04em] text-muted-foreground">
-          Advice
-        </span>
+        {course && hole ? (
+          <span className="truncate text-right text-[0.75rem] font-medium text-muted-foreground">
+            {course.name} · Hole {hole.number}
+          </span>
+        ) : null}
       </header>
 
       <div className="mx-auto mt-14 w-full max-w-md sm:mt-20">
-        {step === "distance" ? (
+        {!course || !hole ? (
           <>
             <h1 className="text-[1.85rem] font-semibold leading-[1.1] tracking-[-0.02em] text-foreground">
+              Start a round first.
+            </h1>
+            <p className="mt-3 text-[0.95rem] text-muted-foreground">
+              Pick your course so the caddy knows the hole.
+            </p>
+            <Button
+              type="button"
+              variant="hero"
+              onClick={() => void navigate({ to: "/start-round" })}
+              className="mt-10 h-14 w-full rounded-full px-6 text-[0.85rem] font-semibold"
+            >
+              Start Round
+            </Button>
+          </>
+        ) : null}
+
+        {course && hole && step === "distance" ? (
+          <>
+            <p className="text-[0.85rem] font-medium text-muted-foreground">
+              Par {hole.par} · {hole.yardage} yards
+            </p>
+            <h1 className="mt-2 text-[1.85rem] font-semibold leading-[1.1] tracking-[-0.02em] text-foreground">
               How far?
             </h1>
             <form className="mt-10 space-y-6" onSubmit={handleDistanceContinue} noValidate>
@@ -131,7 +159,8 @@ function AdvicePage() {
                   type="number"
                   inputMode="numeric"
                   min={1}
-                  max={500}
+                  max={700}
+                  placeholder="154"
                   value={distanceRaw}
                   onChange={(event) => setDistanceRaw(event.target.value)}
                   className={inputClassName}
@@ -157,14 +186,12 @@ function AdvicePage() {
           </>
         ) : null}
 
-        {step === "lie" ? (
+        {course && hole && step === "lie" ? (
           <>
             <h1 className="text-[1.85rem] font-semibold leading-[1.1] tracking-[-0.02em] text-foreground">
               Where are you?
             </h1>
-            <p className="mt-3 text-[0.9rem] text-muted-foreground">
-              {distance} yards
-            </p>
+            <p className="mt-3 text-[0.9rem] text-muted-foreground">{distance} yards</p>
             <div className="mt-10 grid gap-3">
               {LIE_OPTIONS.map((option) => (
                 <Button
@@ -191,7 +218,7 @@ function AdvicePage() {
           </>
         ) : null}
 
-        {step === "recommendation" && recommendation ? (
+        {course && hole && step === "recommendation" && recommendation ? (
           <>
             <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Play this
@@ -243,7 +270,7 @@ function AdvicePage() {
                 onClick={() => void navigate({ to: "/app" })}
                 className="h-12 w-full rounded-full px-6 text-[0.8rem] font-semibold"
               >
-                Home
+                Return Home
               </Button>
             </div>
           </>

@@ -1,3 +1,4 @@
+import type { PlayerContext } from "@/lib/caddy/types";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export const CLUB_OPTIONS = [
@@ -80,6 +81,27 @@ export async function getProfileStatus(userId: string): Promise<ProfileStatus | 
   return {
     exists: true,
     onboardingCompleted: Boolean(data.onboarding_completed),
+  };
+}
+
+/** Handicap + saved club distances for the caddy. Returns null if unavailable. */
+export async function getPlayerContext(userId: string): Promise<PlayerContext | null> {
+  if (!isSupabaseConfigured()) return null;
+  const supabase = getSupabase();
+
+  const [profile, clubs] = await Promise.all([
+    supabase.from("profiles").select("handicap").eq("id", userId).maybeSingle(),
+    supabase.from("club_distances").select("club, distance").eq("user_id", userId),
+  ]);
+
+  if (profile.error || clubs.error) return null;
+
+  return {
+    handicap: profile.data?.handicap == null ? null : Number(profile.data.handicap),
+    clubDistances: (clubs.data ?? []).map((row) => ({
+      club: String(row.club),
+      distance: Number(row.distance),
+    })),
   };
 }
 

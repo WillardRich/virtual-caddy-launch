@@ -12,10 +12,10 @@ export type ShotContext = {
   distance: number;
   distanceUnit: DistanceUnit;
   lie: Lie;
+  course: string | null;
+  hole: number | null;
 
   // Future fields — reserved for later slices
-  course: null;
-  hole: null;
   pinPosition: null;
   wind: null;
   elevation: null;
@@ -33,15 +33,25 @@ export type CourseHazard = {
 
 export type CourseContext = {
   green: {
-    width: number;
-    depth: number;
+    width: number | null;
+    depth: number | null;
     pinPosition: string | null;
-    safeArea: string;
+    safeArea: string | null;
     dangerousAreas: GreenDanger[];
   };
   hazards: CourseHazard[];
   /** True when this context is placeholder / mock data. */
   isMock: boolean;
+};
+
+export type PlayerClubDistance = {
+  club: string;
+  distance: number;
+};
+
+export type PlayerContext = {
+  handicap: number | null;
+  clubDistances: PlayerClubDistance[];
 };
 
 export type CaddyRecommendation = {
@@ -54,4 +64,5 @@ export type CaddyRecommendation = {
 export type CaddyDecisionInput = {
   shot: ShotContext;
   course: CourseContext;
+  player: PlayerContext | null;
 };

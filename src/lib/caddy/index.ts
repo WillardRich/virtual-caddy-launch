@@ -4,17 +4,7 @@ export type {
   CaddyRecommendation,
   GreenDanger,
   Lie,
+  PlayerContext,
   ShotContext,
 } from "@/lib/caddy/types";
-export {
-  getMockCourseContext,
-  getMockCourseSituation,
-  getNextMockCourseContext,
-  MOCK_COURSE_SITUATIONS,
-  resetMockCourseSituationCursor,
-} from "@/lib/caddy/mockCourseContext";
-export {
-  getCaddyRecommendation,
-  getMockRecommendation,
-  getRecommendation,
-} from "@/lib/caddy/getRecommendation";
+export { getCaddyRecommendation, getRecommendation } from "@/lib/caddy/getRecommendation";
