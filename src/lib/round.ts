@@ -9,6 +9,7 @@ export type ActiveRound = {
 };
 
 const STORAGE_PREFIX = "yvc.activeRound.";
+const unsavedRounds = new Map<string, ActiveRound | null>();
 const listeners = new Set<() => void>();
 
 let cachedKey: string | null = null;
@@ -22,11 +23,13 @@ function storageKey(userId: string): string {
 function parseRound(raw: string | null): ActiveRound | null {
   if (!raw) return null;
   try {
-    const value = JSON.parse(raw) as Partial<ActiveRound>;
+    const value = JSON.parse(raw) as Partial<ActiveRound> | null;
     if (
+      !value ||
       typeof value.courseId !== "string" ||
       !getCourse(value.courseId) ||
       typeof value.currentHole !== "number" ||
+      !Number.isInteger(value.currentHole) ||
       value.currentHole < FIRST_HOLE ||
       value.currentHole > LAST_HOLE
     ) {
@@ -45,7 +48,13 @@ function parseRound(raw: string | null): ActiveRound | null {
 export function getActiveRound(userId: string): ActiveRound | null {
   if (typeof window === "undefined") return null;
   const key = storageKey(userId);
-  const raw = window.localStorage.getItem(key);
+  if (unsavedRounds.has(key)) return unsavedRounds.get(key) ?? null;
+  let raw: string | null;
+  try {
+    raw = window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
   if (key === cachedKey && raw === cachedRaw) return cachedRound;
   cachedKey = key;
   cachedRaw = raw;
@@ -56,10 +65,16 @@ export function getActiveRound(userId: string): ActiveRound | null {
 function writeRound(userId: string, round: ActiveRound | null) {
   if (typeof window === "undefined") return;
   const key = storageKey(userId);
-  if (round) {
-    window.localStorage.setItem(key, JSON.stringify(round));
-  } else {
-    window.localStorage.removeItem(key);
+  try {
+    if (round) {
+      window.localStorage.setItem(key, JSON.stringify(round));
+    } else {
+      window.localStorage.removeItem(key);
+    }
+    unsavedRounds.delete(key);
+  } catch {
+    // Keep the round playable in this tab if the browser blocks storage.
+    unsavedRounds.set(key, round);
   }
   listeners.forEach((listener) => listener());
 }
